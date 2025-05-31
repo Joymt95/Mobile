@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Movie Collection</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>My Movie Collection</h1>
+        <!-- Search bar can be removed or repurposed if not needed -->
+        <!-- <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Filter my movies...">
+            <button id="searchButton">Filter</button>
+        </div> -->
+    </header>
+
+    <main>
+        <div id="loadingIndicator" class="hidden">Loading movie details...</div>
+        <div id="errorMessage" class="hidden"></div>
+
+        <h2 id="results-title">Available Movies</h2>
+        <section id="movie-results" class="results-grid">
+            <!-- Movie cards will be inserted here -->
+        </section>
+
+        <section id="movie-details" class="hidden">
+            <button id="backButton" class="hidden">« Back to Collection</button>
+            <div id="details-content">
+                <!-- Full movie details will be shown here -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>Movie data enriched by <a href="https://www.themoviedb.org/" target="_blank">TMDb</a></p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
