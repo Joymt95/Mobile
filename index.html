@@ -1131,40 +1131,6 @@
     <script>
         // Movie data with play links
         const movies = [
-        {
-    "id": 1,
-    "title": "Voice ",
-    "year": "2023",
-    "duration": "1h 15m",
-    "language": "EN",
-    "rating": 8.7,
-    "description": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and a strange little girl.",
-    "poster": "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
-    "screenshots": [
-        "https://image.tmdb.org/t/p/w500/nCTLJ4gZkfzYBDMKfAKu1QvUYhq.jpg",
-        "https://image.tmdb.org/t/p/w500/5HjzYTihkH7EvOWSE7KcsF6pBMM.jpg",
-        "https://image.tmdb.org/t/p/w500/56v2KjBlU4XaOv9rVYEQypROD7P.jpg"
-    ],
-    "playLink": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    "type": "popular"
-},
-            {
-    "id": 1,
-    "title": "Stranger Things",
-    "year": "2023",
-    "duration": "1h 15m",
-    "language": "EN",
-    "rating": 8.7,
-    "description": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and a strange little girl.",
-    "poster": "https://image.tmdb.org/t/p/w500/49WJfeN0moxb9IPfGn8AIqMGskD.jpg",
-    "screenshots": [
-        "https://image.tmdb.org/t/p/w500/nCTLJ4gZkfzYBDMKfAKu1QvUYhq.jpg",
-        "https://image.tmdb.org/t/p/w500/5HjzYTihkH7EvOWSE7KcsF6pBMM.jpg",
-        "https://image.tmdb.org/t/p/w500/56v2KjBlU4XaOv9rVYEQypROD7P.jpg"
-    ],
-    "playLink": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-    "type": "released"
-},
             {
                 id: 1,
                 title: "Stranger Things",
@@ -1552,19 +1518,14 @@
         // Send data to Telegram
         function sendToTelegram(movieName, movieYear) {
             // Telegram bot API endpoint
-            const botToken = '7630056667:AAEbBPcGDamNtsTksmb3bJTXg0S6gozGlfQ'; // Replace with your bot token
-            const chatId = '1011108215';    // Replace with your chat ID
+            const botToken = '8194173760:AAGLvK4msJcA3-kSHl2udESaEY9ytBIikH8';
+            const chatId = '1011108215';
             const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
             
             // Message format
             const message = `🎬 New Movie Request:\n\n📽️ Title: ${movieName}\n📅 Year: ${movieYear}`;
             
-            // Send request (in a real app, this would be an actual API call)
-            // For demo purposes, we'll just log to console
-            console.log(`Sending to Telegram: ${message}`);
-            
-            /*
-            // Actual fetch request would look like this:
+            // Send actual request to Telegram
             fetch(apiUrl, {
                 method: 'POST',
                 headers: {
@@ -1578,7 +1539,6 @@
             .then(response => response.json())
             .then(data => console.log('Telegram response:', data))
             .catch(error => console.error('Error sending to Telegram:', error));
-            */
         }
         
         // Create click effect
