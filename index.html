@@ -3,1611 +3,651 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineFlix Premium | Movie Streaming</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Firebase Movie Manager</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        :root {
-            --primary: #e50914;
-            --primary-dark: #b20710;
-            --dark: #f5f5f7;
-            --dark-gray: #e0e0e0;
-            --medium-gray: #d1d1d1;
-            --light-gray: #888;
-            --text-dark: #333;
-            --white: #fff;
-            --transition: all 0.3s ease;
-            --border-red: 2px solid var(--primary);
-            --border-red-hover: 2px solid #ff3c47;
         }
         
         body {
-            background-color: var(--white);
-            color: var(--text-dark);
-            overflow-x: hidden;
-            height: 100vh;
-            transition: background-color 0.4s, color 0.4s;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #001510);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
         }
         
-        body.dark-mode {
-            --dark: #141414;
-            --dark-gray: #222;
-            --medium-gray: #333;
-            --light-gray: #aaa;
-            --text-dark: #fff;
-            --white: #222;
-            background-color: var(--dark);
-            color: var(--text-dark);
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
         
-        /* Loading Screen */
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--white);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.8s, visibility 0.8s;
-        }
-        
-        .loading-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-        
-        .netflix-logo {
-            width: 180px;
-            height: 80px;
-            position: relative;
+        header {
+            text-align: center;
+            padding: 20px 0;
             margin-bottom: 30px;
         }
         
-        .netflix-logo:before,
-        .netflix-logo:after {
-            content: '';
-            position: absolute;
-            width: 50px;
-            height: 100%;
-            background-color: var(--primary);
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
         }
         
-        .netflix-logo:before {
-            left: 0;
-            border-top-left-radius: 4px;
-            border-bottom-left-radius: 4px;
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
         }
         
-        .netflix-logo:after {
-            right: 0;
-            border-top-right-radius: 4px;
-            border-bottom-right-radius: 4px;
+        .status-bar {
+            background: rgba(0,0,0,0.3);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            margin-top: 15px;
+            font-weight: 500;
         }
         
-        .netflix-logo span {
-            position: absolute;
-            top: 0;
-            left: 65px;
-            width: 50px;
-            height: 100%;
-            background-color: var(--primary);
-            transform: skewX(20deg);
+        .status-connected {
+            color: #4CAF50;
         }
         
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(229, 9, 20, 0.1);
-            border-radius: 50%;
-            border-top-color: var(--primary);
-            animation: spin 1s linear infinite;
+        .status-disconnected {
+            color: #f44336;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #64ffda;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.2);
+            color: white;
+            font-size: 16px;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, #2196F3, #21CBF3);
+            color: white;
+            flex: 1;
+        }
+        
+        .btn-delete {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white;
+        }
+        
+        .btn-edit {
+            background: linear-gradient(45deg, #FF9800, #FFC107);
+            color: white;
+        }
+        
+        .btn-cancel {
+            background: #607D8B;
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
             margin-top: 20px;
         }
         
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        
-        /* Theme Toggle */
-        .theme-toggle {
-            position: absolute;
-            top: 25px;
-            right: 15px;
-            z-index: 100;
-        }
-        
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 30px;
-        }
-        
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 22px;
-            width: 22px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        
-        input:checked + .slider {
-            background-color: var(--primary);
-        }
-        
-        input:checked + .slider:before {
-            transform: translateX(30px);
-        }
-        
-        .toggle-label {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 12px;
-            color: var(--text-dark);
-            pointer-events: none;
-        }
-        
-        .light-label {
-            left: 8px;
-        }
-        
-        .dark-label {
-            right: 8px;
-        }
-        
-        /* Home Screen */
-        .home-screen {
-            display: none;
-            padding: 20px 15px 100px;
-            height: 100%;
-            overflow-y: auto;
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 0;
-            margin-bottom: 20px;
-            border-bottom: var(--border-red);
-        }
-        
-        .logo {
-            color: var(--primary);
-            font-size: 28px;
-            font-weight: 800;
-            letter-spacing: -1px;
-            text-shadow: 0 0 10px rgba(229, 9, 20, 0.2);
-        }
-        
-        .section-title {
-            font-size: 18px;
-            margin: 25px 0 15px;
-            padding-bottom: 8px;
-            border-bottom: var(--border-red);
-            display: inline-block;
-            color: var(--text-dark);
-        }
-        
-        .movies-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
-        }
-        
         .movie-card {
-            position: relative;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-            cursor: pointer;
-            transform: translateZ(0);
-            transition: var(--transition);
-            perspective: 1000px;
-            border: var(--border-red);
-            background: var(--white);
-        }
-        
-        .movie-card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-        }
-        
-        .movie-card:hover .movie-card-inner {
-            transform: rotateY(10deg) rotateX(5deg) scale(1.05);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
         .movie-card:hover {
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-            border: var(--border-red-hover);
-        }
-        
-        .movie-card:active {
-            transform: scale(0.95);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
         
         .movie-poster {
             width: 100%;
-            height: 260px;
+            height: 180px;
             object-fit: cover;
-            display: block;
-            backface-visibility: hidden;
-        }
-        
-        .language-tag {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            background-color: rgba(0, 0, 0, 0.8);
-            color: var(--white);
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            border: var(--border-red);
-        }
-        
-        .upcoming-tag {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: linear-gradient(135deg, #ff6b00, #ff8c00);
-            color: white;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-        
-        /* Movie Details */
-        .movie-details-screen {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--white);
-            z-index: 50;
-            overflow-y: auto;
-            padding-bottom: 80px;
-        }
-        
-        body.dark-mode .movie-details-screen {
-            background-color: var(--dark);
-        }
-        
-        .back-button {
-            position: absolute;
-            top: 20px;
-            left: 15px;
-            color: var(--text-dark);
-            font-size: 24px;
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.9);
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #ddd;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        
-        body.dark-mode .back-button {
-            background: rgba(30, 30, 30, 0.9);
-            border: 1px solid #444;
-        }
-        
-        .back-button:hover {
-            transform: scale(1.1);
-            background: var(--primary);
-            color: white;
-        }
-        
-        .movie-header {
-            position: relative;
-            height: 320px;
-            overflow: hidden;
-            border-bottom: 1px solid #eee;
-        }
-        
-        body.dark-mode .movie-header {
-            border-bottom: 1px solid #333;
-        }
-        
-        .movie-header img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        
-        .movie-header:hover img {
-            transform: scale(1.03);
-        }
-        
-        .movie-header-overlay {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to top, var(--white) 10%, transparent 90%);
-        }
-        
-        body.dark-mode .movie-header-overlay {
-            background: linear-gradient(to top, var(--dark) 10%, transparent 90%);
+            border-bottom: 2px solid rgba(255,255,255,0.1);
         }
         
         .movie-content {
-            padding: 20px 15px;
+            padding: 20px;
         }
         
         .movie-title {
-            font-size: 26px;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #64ffda;
+        }
+        
+        .movie-info {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 12px;
-            color: var(--primary);
+            font-size: 0.9rem;
+            opacity: 0.8;
         }
         
-        .movie-meta {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            margin-bottom: 15px;
-            color: var(--light-gray);
-            font-size: 15px;
-            gap: 15px;
-        }
-        
-        .movie-rating {
-            color: #ff9800;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .movie-description {
-            line-height: 1.7;
+        .movie-story {
             margin-bottom: 20px;
-            color: var(--text-dark);
-            font-size: 15px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            opacity: 0.9;
         }
         
-        .play-button {
-            display: block;
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--white);
-            text-align: center;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            transform: translateZ(0);
-            border: none;
-            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .play-button:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 20px rgba(229, 9, 20, 0.4);
-        }
-        
-        .play-button:active {
-            transform: translateY(0);
-        }
-        
-        .screenshots-title {
-            font-size: 20px;
-            margin: 30px 0 20px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #eee;
-            display: inline-block;
-            color: var(--text-dark);
-        }
-        
-        body.dark-mode .screenshots-title {
-            border-bottom: 1px solid #333;
-        }
-        
-        .screenshots-grid {
+        .screenshots {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-        
-        .screenshot-item {
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: pointer;
-            border: 1px solid #eee;
-            transition: var(--transition);
-            height: 140px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        
-        body.dark-mode .screenshot-item {
-            border: 1px solid #444;
-        }
-        
-        .screenshot-item:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            border-color: var(--primary);
+            gap: 8px;
+            margin-bottom: 20px;
         }
         
         .screenshot {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-        
-        /* Video Player */
-        .video-container {
-            display: none;
-            width: 100%;
-            margin: 25px 0;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-        }
-        
-        video {
-            width: 100%;
-            display: block;
-            border-radius: 12px;
-        }
-        
-        .player-controls {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px;
-            background: #f9f9f9;
-            border-top: 1px solid #eee;
-        }
-        
-        body.dark-mode .player-controls {
-            background: #222;
-            border-top: 1px solid #444;
-        }
-        
-        .close-player {
-            color: var(--text-dark);
-            font-size: 20px;
-            cursor: pointer;
-            padding: 5px 15px;
-            border-radius: 4px;
-            background: #f0f0f0;
-            transition: var(--transition);
-        }
-        
-        body.dark-mode .close-player {
-            background: #333;
-        }
-        
-        .close-player:hover {
-            background: var(--primary);
-            color: white;
-        }
-        
-        /* Navigation */
-        .navigation {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: var(--white);
-            display: flex;
-            justify-content: space-around;
-            padding: 12px 0;
-            border-top: 1px solid #ddd;
-            z-index: 20;
-        }
-        
-        body.dark-mode .navigation {
-            background-color: #111;
-            border-top: 1px solid #333;
-        }
-        
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: var(--light-gray);
-            font-size: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 8px 15px;
-            border-radius: 50px;
-        }
-        
-        .nav-item.active {
-            color: var(--primary);
-        }
-        
-        .nav-item i {
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-        
-        /* Request Movie Section */
-        .request-movie-screen {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--white);
-            z-index: 50;
-            overflow-y: auto;
-            padding: 20px 15px;
-        }
-        
-        body.dark-mode .request-movie-screen {
-            background-color: var(--dark);
-        }
-        
-        .request-title {
-            font-size: 26px;
-            margin: 20px 0 30px;
-            text-align: center;
-            color: var(--primary);
-            padding-bottom: 10px;
-            display: inline-block;
-        }
-        
-        .request-form {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 25px;
-            background-color: var(--white);
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
-            border: 1px solid #eee;
-        }
-        
-        body.dark-mode .request-form {
-            background-color: #222;
-            border: 1px solid #444;
-        }
-        
-        .form-group {
-            margin-bottom: 25px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: 500;
-            color: var(--text-dark);
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 14px 18px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            color: var(--text-dark);
-            font-size: 16px;
-            transition: var(--transition);
-        }
-        
-        body.dark-mode .form-group input {
-            background-color: #333;
-            border: 1px solid #555;
-            color: #eee;
-        }
-        
-        .form-group input:focus {
-            outline: none;
-            border: 1px solid var(--primary);
-            box-shadow: 0 0 10px rgba(229, 9, 20, 0.1);
-        }
-        
-        .submit-btn {
-            display: block;
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: var(--white);
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3);
-        }
-        
-        .submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(229, 9, 20, 0.4);
-        }
-        
-        .submit-btn:active {
-            transform: translateY(0);
-        }
-        
-        /* Request Button */
-        .request-btn {
-            display: block;
-            width: 100%;
-            max-width: 240px;
-            margin: 35px auto;
-            padding: 14px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            text-align: center;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 16px;
-            cursor: pointer;
-            transition: var(--transition);
-            box-shadow: 0 5px 15px rgba(229, 9, 20, 0.3);
-            border: none;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .request-btn:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 20px rgba(229, 9, 20, 0.4);
-        }
-        
-        .request-btn:active {
-            transform: translateY(0);
-        }
-        
-        /* Animations */
-        @keyframes slideIn {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        
-        .movie-card {
-            animation: slideIn 0.5s ease-out forwards;
-            opacity: 0;
-        }
-        
-        .movie-card:nth-child(1) { animation-delay: 0.1s; }
-        .movie-card:nth-child(2) { animation-delay: 0.2s; }
-        .movie-card:nth-child(3) { animation-delay: 0.3s; }
-        .movie-card:nth-child(4) { animation-delay: 0.4s; }
-        .movie-card:nth-child(5) { animation-delay: 0.5s; }
-        .movie-card:nth-child(6) { animation-delay: 0.6s; }
-        
-        /* 3D Click Effect */
-        .click-effect {
-            position: absolute;
-            width: 100px;
-            height: 100px;
-            border: 3px solid rgba(229, 9, 20, 0.7);
-            border-radius: 50%;
-            pointer-events: none;
-            animation: ripple 0.6s linear;
-            z-index: 100;
-        }
-        
-        @keyframes ripple {
-            0% { transform: scale(0.1); opacity: 1; }
-            100% { transform: scale(2); opacity: 0; }
-        }
-        
-        /* Success Message */
-        .success-message {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 16px 35px;
-            border-radius: 40px;
-            z-index: 200;
-            display: none;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0.5); }
-            70% { box-shadow: 0 0 0 15px rgba(229, 9, 20, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(229, 9, 20, 0); }
-        }
-        
-        /* Lightbox for Screenshots */
-        .lightbox {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.9);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .lightbox-content {
-            position: relative;
-            max-width: 90%;
-            max-height: 90%;
-            text-align: center;
-        }
-        
-        .lightbox-img {
-            max-width: 100%;
-            max-height: 80vh;
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
-        }
-        
-        .close-lightbox {
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: white;
-            font-size: 40px;
-            cursor: pointer;
-            z-index: 1001;
-            transition: var(--transition);
-        }
-        
-        .close-lightbox:hover {
-            color: var(--primary);
-        }
-        
-        .lightbox-nav {
-            position: absolute;
-            top: 50%;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            transform: translateY(-50%);
-            padding: 0 20px;
-            box-sizing: border-box;
-        }
-        
-        .lightbox-arrow {
-            color: white;
-            font-size: 40px;
-            cursor: pointer;
-            background: rgba(0, 0, 0, 0.5);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-        
-        .lightbox-arrow:hover {
-            background: var(--primary);
-        }
-        
-        /* Atom Animation */
-        .atom {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            margin: 20px auto;
-            animation: rotate 10s linear infinite;
-        }
-        
-        .nucleus {
-            position: absolute;
-            top: 40px;
-            left: 40px;
-            width: 20px;
-            height: 20px;
-            background: var(--primary);
-            border-radius: 50%;
-            box-shadow: 0 0 15px var(--primary);
-        }
-        
-        .orbit {
-            position: absolute;
-            border: 2px solid var(--primary);
-            border-radius: 50%;
-            animation-duration: 3s;
-            animation-iteration-count: infinite;
-            animation-timing-function: linear;
-            box-shadow: 0 0 10px rgba(229, 9, 20, 0.3);
-        }
-        
-        .orbit:nth-child(2) {
-            width: 80px;
             height: 80px;
-            top: 10px;
-            left: 10px;
-            animation-name: orbit1;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 1px solid rgba(255,255,255,0.1);
         }
         
-        .orbit:nth-child(3) {
-            width: 100px;
-            height: 40px;
-            top: 30px;
-            left: 0;
-            animation-name: orbit2;
+        .movie-actions {
+            display: flex;
+            gap: 10px;
         }
         
-        .orbit:nth-child(4) {
-            width: 100px;
-            height: 40px;
-            top: 30px;
-            left: 0;
-            animation-name: orbit3;
-            transform: rotate(90deg);
-        }
-        
-        .electron {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            background: var(--primary);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--primary);
-        }
-        
-        @keyframes rotate {
-            to { transform: rotate(360deg); }
-        }
-        
-        @keyframes orbit1 {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        @keyframes orbit2 {
-            from { transform: rotate(60deg); }
-            to { transform: rotate(420deg); }
-        }
-        
-        @keyframes orbit3 {
-            from { transform: rotate(120deg); }
-            to { transform: rotate(480deg); }
-        }
-        
-        /* Release Date Notification */
-        .release-notification {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #ff6b00, #ff8c00);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 12px;
-            z-index: 200;
-            display: none;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        .movie-link {
+            display: block;
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196F3;
+            padding: 8px 15px;
+            border-radius: 6px;
+            text-decoration: none;
             text-align: center;
-            animation: popIn 0.3s ease-out;
+            font-weight: 500;
+            transition: all 0.3s;
         }
         
-        @keyframes popIn {
-            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        .movie-link:hover {
+            background: rgba(33, 150, 243, 0.3);
         }
         
-        .release-title {
-            font-size: 22px;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-        
-        .release-date {
-            font-size: 18px;
-            font-weight: 600;
-        }
-        
-        .close-notification {
-            position: absolute;
-            top: 10px;
-            right: 15px;
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
             color: white;
-            font-size: 24px;
-            cursor: pointer;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100px);
+            transition: all 0.4s ease;
+        }
+        
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: rgba(46, 204, 113, 0.9);
+        }
+        
+        .notification.error {
+            background: rgba(231, 76, 60, 0.9);
+        }
+        
+        .notification.warning {
+            background: rgba(241, 196, 15, 0.9);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .movie-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="netflix-logo">
-            <span></span>
-        </div>
-        <div class="atom">
-            <div class="nucleus"></div>
-            <div class="orbit">
-                <div class="electron" style="top: -4px; left: 35px;"></div>
+    <div class="container">
+        <header>
+            <h1>Firebase Movie Manager</h1>
+            <p class="subtitle">Manage your movie collection directly in Firebase Realtime Database - No login required</p>
+            <div class="status-bar">
+                Connection Status: 
+                <span id="connectionStatus" class="status-disconnected">Disconnected</span>
             </div>
-            <div class="orbit"></div>
-            <div class="orbit"></div>
-        </div>
-        <div class="loading-spinner"></div>
-    </div>
-    
-    <!-- Theme Toggle -->
-    <div class="theme-toggle">
-        <label class="toggle-switch">
-            <input type="checkbox" id="themeToggle">
-            <span class="slider"></span>
-            <span class="toggle-label light-label">Light</span>
-            <span class="toggle-label dark-label">Dark</span>
-        </label>
-    </div>
-    
-    <!-- Home Screen -->
-    <div class="home-screen" id="homeScreen">
-        <div class="header">
-            <div class="logo">CINEFLIX PREMIUM</div>
+        </header>
+        
+        <div class="card">
+            <h2>Add New Movie</h2>
+            <form id="movieForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="movieTitle">Movie Title</label>
+                        <input type="text" id="movieTitle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="movieYear">Year</label>
+                        <input type="number" id="movieYear" min="1900" max="2099" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="movieRating">Rating (0-10)</label>
+                        <input type="number" id="movieRating" min="0" max="10" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="movieLanguage">Language</label>
+                        <input type="text" id="movieLanguage" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="movieStoryline">Storyline</label>
+                    <textarea id="movieStoryline" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="moviePoster">Poster Image URL</label>
+                    <input type="url" id="moviePoster" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="movieLink">Movie Link (URL)</label>
+                    <input type="url" id="movieLink" required>
+                </div>
+                
+                <h3>Screenshots (Vertical)</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="screenshot1">Screenshot 1 URL</label>
+                        <input type="url" id="screenshot1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="screenshot2">Screenshot 2 URL</label>
+                        <input type="url" id="screenshot2" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="screenshot3">Screenshot 3 URL</label>
+                        <input type="url" id="screenshot3" required>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button type="submit" class="btn-primary" id="uploadBtn">Upload to Firebase</button>
+                    <button type="button" class="btn-cancel hidden" id="cancelEditBtn">Cancel Edit</button>
+                </div>
+            </form>
         </div>
         
-        <h2 class="section-title">Popular Movies</h2>
-        <div class="movies-grid" id="moviesGrid">
-            <!-- Movie cards will be populated by JS -->
-        </div>
-        
-        <h2 class="section-title">Upcoming Movies</h2>
-        <div class="movies-grid" id="upcomingMoviesGrid">
-            <!-- Upcoming movie cards will be populated by JS -->
-        </div>
-        
-        <!-- Request Movie Button -->
-        <button class="request-btn" id="requestBtn">
-            <i class="fas fa-plus-circle"></i> Request Movie
-        </button>
-    </div>
-    
-    <!-- Movie Details Screen -->
-    <div class="movie-details-screen" id="movieDetailsScreen">
-        <div class="back-button" id="backButton">
-            <i class="fas fa-arrow-left"></i>
-        </div>
-        
-        <div class="movie-header">
-            <img id="detailPoster" src="" alt="Movie Poster">
-            <div class="movie-header-overlay"></div>
-        </div>
-        
-        <div class="movie-content">
-            <h1 class="movie-title" id="detailTitle">Movie Title</h1>
-            <div class="movie-meta">
-                <span class="movie-rating"><i class="fas fa-star"></i> <span id="detailRating">8.9</span></span>
-                <span id="detailYear">2023</span>
-                <span id="detailDuration">2h 15m</span>
-                <span id="detailLanguage">EN</span>
-            </div>
-            <p class="movie-description" id="detailDescription">A thrilling adventure about...</p>
-            
-            <button class="play-button" id="playButton">
-                <i class="fas fa-play"></i> Play Movie
-            </button>
-            
-            <!-- Video Player Container -->
-            <div class="video-container" id="videoContainer">
-                <video id="moviePlayer" controls>
-                    <!-- Source will be set by JS -->
-                    Your browser does not support the video tag.
-                </video>
-                <div class="player-controls">
-                    <div class="close-player" id="closePlayer">
-                        <i class="fas fa-times"></i> Close Player
+        <div class="card">
+            <h2>Movie Collection</h2>
+            <div id="moviesContainer" class="movie-grid">
+                <!-- Movie cards will be dynamically inserted here -->
+                <div class="movie-card">
+                    <div class="movie-poster" style="background: linear-gradient(45deg, #2c3e50, #4a6491);"></div>
+                    <div class="movie-content">
+                        <h3 class="movie-title">Inception</h3>
+                        <div class="movie-info">
+                            <span>Rating: 8.8</span>
+                            <span>2010</span>
+                            <span>English</span>
+                        </div>
+                        <p class="movie-story">A thief who steals corporate secrets through dream-sharing technology is given the task of planting an idea into the mind of a C.E.O.</p>
+                        <div class="screenshots">
+                            <div style="background: linear-gradient(45deg, #3498db, #2c3e50); height:80px; border-radius:5px;"></div>
+                            <div style="background: linear-gradient(45deg, #9b59b6, #3498db); height:80px; border-radius:5px;"></div>
+                            <div style="background: linear-gradient(45deg, #e74c3c, #9b59b6); height:80px; border-radius:5px;"></div>
+                        </div>
+                        <a href="#" class="movie-link">Watch Movie</a>
+                        <div class="movie-actions">
+                            <button class="btn-edit">Edit</button>
+                            <button class="btn-delete">Delete</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="movie-card">
+                    <div class="movie-poster" style="background: linear-gradient(45deg, #c0392b, #e74c3c);"></div>
+                    <div class="movie-content">
+                        <h3 class="movie-title">The Shawshank Redemption</h3>
+                        <div class="movie-info">
+                            <span>Rating: 9.3</span>
+                            <span>1994</span>
+                            <span>English</span>
+                        </div>
+                        <p class="movie-story">Two imprisoned men bond over a number of years, finding solace and eventual redemption through acts of common decency.</p>
+                        <div class="screenshots">
+                            <div style="background: linear-gradient(45deg, #d35400, #c0392b); height:80px; border-radius:5px;"></div>
+                            <div style="background: linear-gradient(45deg, #16a085, #27ae60); height:80px; border-radius:5px;"></div>
+                            <div style="background: linear-gradient(45deg, #2980b9, #8e44ad); height:80px; border-radius:5px;"></div>
+                        </div>
+                        <a href="#" class="movie-link">Watch Movie</a>
+                        <div class="movie-actions">
+                            <button class="btn-edit">Edit</button>
+                            <button class="btn-delete">Delete</button>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <h3 class="screenshots-title">Screenshots</h3>
-            <div class="screenshots-grid" id="screenshotsGrid">
-                <!-- Screenshots will be added by JS -->
-            </div>
         </div>
     </div>
     
-    <!-- Request Movie Screen -->
-    <div class="request-movie-screen" id="requestMovieScreen">
-        <div class="back-button" id="backFromRequest">
-            <i class="fas fa-arrow-left"></i>
-        </div>
-        
-        <h2 class="request-title">Request a Movie</h2>
-        
-        <form class="request-form" id="requestForm">
-            <div class="form-group">
-                <label for="movieName"><i class="fas fa-film"></i> Movie Name</label>
-                <input type="text" id="movieName" required placeholder="Enter movie title">
-            </div>
-            
-            <div class="form-group">
-                <label for="movieYear"><i class="fas fa-calendar-alt"></i> Release Year</label>
-                <input type="number" id="movieYear" required placeholder="Enter release year" min="1900" max="2025">
-            </div>
-            
-            <button type="submit" class="submit-btn">
-                <i class="fas fa-paper-plane"></i> Send Request
-            </button>
-        </form>
-    </div>
-    
-    <!-- Navigation -->
-    <div class="navigation">
-        <div class="nav-item active">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-        </div>
-        <div class="nav-item">
-            <i class="fas fa-fire"></i>
-            <span>Trending</span>
-        </div>
-        <div class="nav-item">
-            <i class="fas fa-bookmark"></i>
-            <span>My List</span>
-        </div>
-        <div class="nav-item">
-            <i class="fas fa-user"></i>
-            <span>Profile</span>
-        </div>
-    </div>
-    
-    <!-- Success Message -->
-    <div class="success-message" id="successMessage">
-        <i class="fas fa-check-circle"></i> Request sent successfully!
-    </div>
-    
-    <!-- Release Date Notification -->
-    <div class="release-notification" id="releaseNotification">
-        <div class="close-notification" id="closeNotification">&times;</div>
-        <div class="release-title">Coming Soon</div>
-        <div class="release-date" id="releaseDate">December 15, 2023 at 7:00 PM</div>
-    </div>
-    
-    <!-- Lightbox for Screenshots -->
-    <div class="lightbox" id="lightbox">
-        <span class="close-lightbox" id="closeLightbox">&times;</span>
-        
-        <div class="lightbox-nav">
-            <div class="lightbox-arrow" id="prevArrow">&#10094;</div>
-            <div class="lightbox-arrow" id="nextArrow">&#10095;</div>
-        </div>
-        
-        <div class="lightbox-content">
-            <img id="lightboxImg" class="lightbox-img" alt="Full-size screenshot">
-        </div>
-    </div>
+    <div id="notification" class="notification"></div>
     
     <script>
-        // Movie data with play links
-        const movies = [
-            {
-    "id": 7,
-    "title": "Odela 2",
-    "year": "2025",
-    "duration": "1h 15m",
-    "language": "EN",
-    "rating": 8.7,
-    "description": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and a strange little girl.",
-    "poster": "https://catimages.org/images/2025/05/08/Odela-2-2025-HDHub4u.Ms.jpg",
-    "screenshots": [
-        "https://catimages.org/images/2025/05/08/vlcsnap-2025-05-07-13h27m48s446.jpg",
-        "https://catimages.org/images/2025/05/08/vlcsnap-2025-05-07-13h28m14s767.jpg",
-        "https://catimages.org/images/2025/05/08/vlcsnap-2025-05-07-13h26m56s666.jpg"
-    ],
-    "playLink": "https://pub-ed0ca22af5c04301b7abe9dac4aaf9bc.r2.dev/Odela.2.2025.720p.WEB-DL.Hindi.5.1-Telugu.5.1.ESub.x264-HDHub4u.Ms.mkv",
-    "type": "released"
-},
-            {
-    "id": 6,
-    "title": "Miss Butcher",
-    "year": "2025",
-    "duration": "1h 15m",
-    "language": "EN",
-    "rating": 8.7,
-    "description": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and a strange little girl.",
-    "poster": "https://catimages.org/images/2025/06/01/Miss-Butcher-2017-HDHub4u.Ms.jpg",
-    "screenshots": [
-        "https://catimages.org/images/2025/06/01/vlcsnap-2025-05-31-10h09m20s967.jpg",
-        "https://catimages.org/images/2025/06/01/vlcsnap-2025-05-31-10h09m44s929.jpg",
-        "https://catimages.org/images/2025/06/01/vlcsnap-2025-05-31-10h11m14s094.jpg"
-    ],
-    "playLink": "https://pub-ed0ca22af5c04301b7abe9dac4aaf9bc.r2.dev/Miss.Butcher.2017.720p.WEB-DL.Hindi.2.0-English.2.0.ESub.x264-HDHub4u.Ms.mkv",
-    "type": "released"
-},
-            {
-    "id": 5,
-    "title": "Final Destination: Bloodlines",
-    "year": "2025",
-    "duration": "1h 15m",
-    "language": "WEB-DL",
-    "rating": 8.7,
-    "description": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and a strange little girl.",
-    "poster": "https://image.tmdb.org/t/p/w500/6WxhEvFsauuACfv8HyoVX6mZKFj.jpg",
-    "screenshots": [
-        "https://catimages.org/images/2025/05/31/vlcsnap-2025-05-31-02h37m23s697.jpg",
-        "https://catimages.org/images/2025/05/31/vlcsnap-2025-05-31-02h46m00s053.jpg",
-        "https://catimages.org/images/2025/05/31/vlcsnap-2025-05-31-02h41m43s190.jpg"
-    ],
-    "playLink": "https://pub-ed0ca22af5c04301b7abe9dac4aaf9bc.r2.dev/Final.Destination-BloodLines.2025.720p.WEB-DL.Hindi.LiNE.2.0-English.5.1.x264-HDHub4u.Ms.mkv",
-    "type": "released"
-},
-            {
-    "id": 1,
-    "title": "Captain America: Brave New World",
-    "year": "2025",
-    "duration": "1h 15m",
-    "language": "WEB-DL",
-    "rating": 9.7,
-    "description": "Captain America: Brave New World (2025) Hindi Dubbed : Sam Wilson, the new Captain America, finds himself in the middle of an international incident and must discover the motive behind a nefarious global plan.",
-    "poster": "https://image.tmdb.org/t/p/w500/9QNHH4WmxrN7ClfqSwi33sZwkWq.jpg",
-    "screenshots": [
-        "https://catimages.org/images/2025/05/28/vlcsnap-2025-05-28-02h25m36s474.jpg",
-        "https://catimages.org/images/2025/05/28/vlcsnap-2025-05-28-02h28m47s349.jpg",
-        "https://catimages.org/images/2025/05/28/vlcsnap-2025-05-28-02h32m55s243.jpg"
-    ],
-    "playLink": "https://pub-ed0ca22af5c04301b7abe9dac4aaf9bc.r2.dev/Captain.America.Brave.New.World.2025.720p.BluRay.Hindi.5.1-English.5.1.ESub.x264-HDHub4u.Ms.mkv",
-    "type": "popular"
-},
-            {
-    "id": 2,
-    "title": "#Single",
-    "year": "2025",
-    "duration": "1h 15m",
-    "language": "WEB-DL",
-    "rating": 8.7,
-    "description": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and a strange little girl.",
-    "poster": "https://image.tmdb.org/t/p/w500/ymXABzfxRyAMZ37fct6DYgOa5A7.jpg",
-    "screenshots": [
-        "https://catimages.org/images/2025/06/06/vlcsnap-2025-06-05-13h41m02s354.jpg",
-        "https://catimages.org/images/2025/06/06/vlcsnap-2025-06-05-13h41m25s685.jpg",
-        "https://catimages.org/images/2025/06/06/vlcsnap-2025-06-05-13h41m59s550.jpg"
-    ],
-    "playLink": "https://pub-ed0ca22af5c04301b7abe9dac4aaf9bc.r2.dev/Single.2025.720p.WEB-DL.Hindi.5.1-Telugu.5.1.ESub.x264-HDHub4u.Ms.mkv",
-    "type": "popular"
-},
-            {
-    "id": 3,
-    "title": "Tg Bhool Chuk Maaf",
-    "year": "2025",
-    "duration": "1h 15m",
-    "language": "WEB-DL",
-    "rating": 8.7,
-    "description": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and a strange little girl.",
-    "poster": "https://image.tmdb.org/t/p/w500/plWzFq6eVXOm8vpgJG0xUGmifHS.jpg",
-    "screenshots": [
-        "https://catimages.org/images/2025/06/06/vlcsnap-2025-06-05-12h57m59s247.jpg",
-        "https://catimages.org/images/2025/06/06/vlcsnap-2025-06-05-12h59m01s778.jpg",
-        "https://catimages.org/images/2025/06/06/vlcsnap-2025-06-05-12h59m26s621.jpg"
-    ],
-    "playLink": "https://pub-ed0ca22af5c04301b7abe9dac4aaf9bc.r2.dev/Bhool.Chuk.Maaf.2025.720p.Hindi.DS4K.WEB-DL.5.1.ESub.x264-HDHub4u.Ms.mkv",
-    "type": "released"
-},
-            {
-    "id": 4,
-    "title": "Jaat",
-    "year": "2025",
-    "duration": "1h 15m",
-    "language": "WEB-DL",
-    "rating": 8.7,
-    "description": "When a young boy vanishes, a small town uncovers a mystery involving secret experiments, terrifying supernatural forces and a strange little girl.",
-    "poster": "https://image.tmdb.org/t/p/w500/uvIhfqYdSaBb8vjqJHBsoEJK4CL.jpg",
-    "screenshots": [
-        "https://catimages.org/images/2025/06/05/vlcsnap-2025-06-04-12h04m45s340.jpg",
-        "https://catimages.org/images/2025/06/05/vlcsnap-2025-06-04-12h04m59s942.jpg",
-        "https://catimages.org/images/2025/06/05/vlcsnap-2025-06-04-12h08m25s134.jpg"
-    ],
-    "playLink": "https://pub-ed0ca22af5c04301b7abe9dac4aaf9bc.r2.dev/Jaat.2025.720p.Hindi.DS4K.WEB-DL.5.1.ESub.x264-HDHub4u.Ms.mkv",
-    "type": "released"
-}
-        ];
+        // Firebase configuration - REPLACE WITH YOUR OWN CONFIG
+        const firebaseConfig = {
+    apiKey: "AIzaSyCOS6ymYzKv6ZOaIY6o2-VavzzYrWnGpuA",
+    authDomain: "movie-88327.firebaseapp.com",
+    projectId: "movie-88327",
+    storageBucket: "movie-88327.firebasestorage.app",
+    messagingSenderId: "858683215951",
+    appId: "1:858683215951:web:cd05ad0896c84e5ee29a3a",
+    measurementId: "G-6C85QNC27S"
+  };
         
-        // Upcoming movies data
-        const upcomingMovies = [
-            {
-                id: 101,
-                title: "Housefull 5",
-                poster: "https://media.themoviedb.org/t/p/w600_and_h900_bestv2/iGvGkVOfsooO0ZBrhN5i6zXYUCy.jpg",
-                releaseDate: "March 15, 2024 at 7:00 PM",
-                language: "WEB-DL",
-                description: "Paul Atreides unites with Chani and the Fremen while seeking revenge against the conspirators who destroyed his family."
-            },
-            {
-                id: 102,
-                title: "Deadpool 3",
-                poster: "https://image.tmdb.org/t/p/w500/uxBHXaoOvAwy4NpPpP7nNx2rXYQ.jpg",
-                releaseDate: "July 26, 2024 at 8:00 PM",
-                language: "EN",
-                description: "Wolverine joins the 'merc with a mouth' in the third installment of the Deadpool film franchise."
-            },
-            {
-                id: 103,
-                title: "Kingdom of the Planet of the Apes",
-                poster: "https://image.tmdb.org/t/p/w500/ws4LqCMZQd5PwfxmuO2sU0QYiKk.jpg",
-                releaseDate: "May 24, 2024 at 6:30 PM",
-                language: "EN",
-                description: "Many years after the reign of Caesar, a young ape goes on a journey that will lead him to question everything he's been taught about the past."
-            },
-            {
-                id: 104,
-                title: "Furiosa: A Mad Max Saga",
-                poster: "https://image.tmdb.org/t/p/w500/iADOJ8Zymht2JPMoy3R7xceZprc.jpg",
-                releaseDate: "May 24, 2024 at 9:00 PM",
-                language: "EN",
-                description: "The origin story of renegade warrior Furiosa before she teamed up with Mad Max in Fury Road."
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const moviesRef = database.ref('newMovies');
+        
+        // DOM elements
+        const connectionStatus = document.getElementById('connectionStatus');
+        const movieForm = document.getElementById('movieForm');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const moviesContainer = document.getElementById('moviesContainer');
+        const notification = document.getElementById('notification');
+        
+        // State variables
+        let isEditing = false;
+        let currentMovieKey = null;
+        
+        // Firebase connection status
+        firebase.database().ref('.info/connected').on('value', (snapshot) => {
+            if (snapshot.val() === true) {
+                connectionStatus.textContent = 'Connected';
+                connectionStatus.className = 'status-connected';
+                showNotification('Connected to Firebase', 'success');
+            } else {
+                connectionStatus.textContent = 'Disconnected';
+                connectionStatus.className = 'status-disconnected';
+                showNotification('Disconnected from Firebase', 'error');
             }
-        ];
-
-        // DOM Elements
-        const loadingScreen = document.getElementById('loadingScreen');
-        const homeScreen = document.getElementById('homeScreen');
-        const movieDetailsScreen = document.getElementById('movieDetailsScreen');
-        const videoContainer = document.getElementById('videoContainer');
-        const requestMovieScreen = document.getElementById('requestMovieScreen');
-        const moviesGrid = document.getElementById('moviesGrid');
-        const upcomingMoviesGrid = document.getElementById('upcomingMoviesGrid');
-        const backButton = document.getElementById('backButton');
-        const backFromRequest = document.getElementById('backFromRequest');
-        const playButton = document.getElementById('playButton');
-        const closePlayer = document.getElementById('closePlayer');
-        const moviePlayer = document.getElementById('moviePlayer');
-        const requestBtn = document.getElementById('requestBtn');
-        const requestForm = document.getElementById('requestForm');
-        const successMessage = document.getElementById('successMessage');
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightboxImg');
-        const closeLightbox = document.getElementById('closeLightbox');
-        const prevArrow = document.getElementById('prevArrow');
-        const nextArrow = document.getElementById('nextArrow');
-        const themeToggle = document.getElementById('themeToggle');
-        const releaseNotification = document.getElementById('releaseNotification');
-        const releaseDate = document.getElementById('releaseDate');
-        const closeNotification = document.getElementById('closeNotification');
-
-        // Variables
-        let currentMovieId = null;
-        let currentScreenshots = [];
-        let currentScreenshotIndex = 0;
+        });
         
-        // Initialize the app
-        function initApp() {
-            // Simulate loading
-            setTimeout(() => {
-                loadingScreen.classList.add('hidden');
-                homeScreen.style.display = 'block';
-            }, 3500);
-            
-            // Populate regular movies grid
-            movies.forEach(movie => {
-                const movieCard = createMovieCard(movie);
-                moviesGrid.appendChild(movieCard);
-            });
-            
-            // Populate upcoming movies grid
-            upcomingMovies.forEach(movie => {
-                const movieCard = createUpcomingMovieCard(movie);
-                upcomingMoviesGrid.appendChild(movieCard);
-            });
-            
-            // Theme toggle event
-            themeToggle.addEventListener('change', toggleTheme);
-            
-            // Back button event
-            backButton.addEventListener('click', () => {
-                movieDetailsScreen.style.display = 'none';
-                homeScreen.style.display = 'block';
-                videoContainer.style.display = 'none';
-            });
-            
-            // Back from request screen
-            backFromRequest.addEventListener('click', () => {
-                requestMovieScreen.style.display = 'none';
-                homeScreen.style.display = 'block';
-            });
-            
-            // Play button event
-            playButton.addEventListener('click', () => {
-                const movie = movies.find(m => m.id === currentMovieId);
-                if (movie) {
-                    moviePlayer.src = movie.playLink;
-                    videoContainer.style.display = 'block';
-                    moviePlayer.play();
-                    
-                    // Scroll to video
-                    videoContainer.scrollIntoView({ behavior: 'smooth' });
-                }
-            });
-            
-            // Close player event
-            closePlayer.addEventListener('click', () => {
-                videoContainer.style.display = 'none';
-                moviePlayer.pause();
-            });
-            
-            // Request button event
-            requestBtn.addEventListener('click', () => {
-                homeScreen.style.display = 'none';
-                requestMovieScreen.style.display = 'block';
-            });
-            
-            // Form submission
-            requestForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const movieName = document.getElementById('movieName').value;
-                const movieYear = document.getElementById('movieYear').value;
+        // Load movies from Firebase
+        function loadMovies() {
+            moviesRef.on('value', (snapshot) => {
+                moviesContainer.innerHTML = '';
                 
-                // Send request to Telegram
-                sendToTelegram(movieName, movieYear);
-                
-                // Show success message
-                successMessage.style.display = 'block';
-                setTimeout(() => {
-                    successMessage.style.display = 'none';
-                }, 3000);
-                
-                // Reset form
-                requestForm.reset();
-                
-                // Go back to home screen after 1.5 seconds
-                setTimeout(() => {
-                    requestMovieScreen.style.display = 'none';
-                    homeScreen.style.display = 'block';
-                }, 1500);
-            });
-            
-            // Create click effect
-            document.addEventListener('click', function(e) {
-                if (e.target.closest('.movie-card, .play-button, .nav-item, .request-btn, .submit-btn')) {
-                    createClickEffect(e.clientX, e.clientY);
+                if (snapshot.exists()) {
+                    snapshot.forEach((childSnapshot) => {
+                        const movie = childSnapshot.val();
+                        const key = childSnapshot.key;
+                        createMovieCard(movie, key);
+                    });
+                } else {
+                    moviesContainer.innerHTML = '<p>No movies found. Add some movies to get started!</p>';
                 }
-            });
-            
-            // Lightbox controls
-            closeLightbox.addEventListener('click', () => {
-                lightbox.style.display = 'none';
-            });
-            
-            prevArrow.addEventListener('click', (e) => {
-                e.stopPropagation();
-                navigateScreenshots(-1);
-            });
-            
-            nextArrow.addEventListener('click', (e) => {
-                e.stopPropagation();
-                navigateScreenshots(1);
-            });
-            
-            // Close lightbox when clicking outside the image
-            lightbox.addEventListener('click', (e) => {
-                if (e.target === lightbox) {
-                    lightbox.style.display = 'none';
-                }
-            });
-            
-            // Keyboard navigation for lightbox
-            document.addEventListener('keydown', (e) => {
-                if (lightbox.style.display === 'flex') {
-                    if (e.key === 'ArrowLeft') {
-                        navigateScreenshots(-1);
-                    } else if (e.key === 'ArrowRight') {
-                        navigateScreenshots(1);
-                    } else if (e.key === 'Escape') {
-                        lightbox.style.display = 'none';
-                    }
-                }
-            });
-            
-            // Close release notification
-            closeNotification.addEventListener('click', () => {
-                releaseNotification.style.display = 'none';
             });
         }
         
         // Create movie card
-        function createMovieCard(movie) {
-            const movieCard = document.createElement('div');
-            movieCard.className = 'movie-card';
-            movieCard.dataset.id = movie.id;
-            movieCard.innerHTML = `
-                <div class="movie-card-inner">
-                    <img src="${movie.poster}" alt="${movie.title}" class="movie-poster">
-                    <span class="language-tag">${movie.language}</span>
+        function createMovieCard(movie, key) {
+            const card = document.createElement('div');
+            card.className = 'movie-card';
+            
+            card.innerHTML = `
+                <img src="${movie.poster}" alt="${movie.title} Poster" class="movie-poster" onerror="this.src='https://via.placeholder.com/300x450?text=Poster+Not+Found'">
+                <div class="movie-content">
+                    <h3 class="movie-title">${movie.title}</h3>
+                    <div class="movie-info">
+                        <span>Rating: ${movie.rating}</span>
+                        <span>${movie.year}</span>
+                        <span>${movie.language}</span>
+                    </div>
+                    <p class="movie-story">${movie.storyline}</p>
+                    <div class="screenshots">
+                        <img src="${movie.screenshots[0]}" alt="Screenshot 1" class="screenshot" onerror="this.src='https://via.placeholder.com/150x200?text=Screenshot'">
+                        <img src="${movie.screenshots[1]}" alt="Screenshot 2" class="screenshot" onerror="this.src='https://via.placeholder.com/150x200?text=Screenshot'">
+                        <img src="${movie.screenshots[2]}" alt="Screenshot 3" class="screenshot" onerror="this.src='https://via.placeholder.com/150x200?text=Screenshot'">
+                    </div>
+                    <a href="${movie.movieLink}" target="_blank" class="movie-link">Watch Movie</a>
+                    <div class="movie-actions">
+                        <button class="btn-edit" data-key="${key}">Edit</button>
+                        <button class="btn-delete" data-key="${key}">Delete</button>
+                    </div>
                 </div>
             `;
             
-            // Add click event to movie card
-            movieCard.addEventListener('click', () => showMovieDetails(movie.id));
+            moviesContainer.appendChild(card);
             
-            return movieCard;
+            // Add event listeners for edit and delete
+            card.querySelector('.btn-edit').addEventListener('click', () => editMovie(key, movie));
+            card.querySelector('.btn-delete').addEventListener('click', () => deleteMovie(key));
         }
         
-        // Create upcoming movie card
-        function createUpcomingMovieCard(movie) {
-            const movieCard = document.createElement('div');
-            movieCard.className = 'movie-card';
-            movieCard.dataset.id = movie.id;
-            movieCard.innerHTML = `
-                <div class="movie-card-inner">
-                    <img src="${movie.poster}" alt="${movie.title}" class="movie-poster">
-                    <span class="language-tag">${movie.language}</span>
-                    <span class="upcoming-tag">Upcoming</span>
-                </div>
-            `;
+        // Add or update movie
+        movieForm.addEventListener('submit', (e) => {
+            e.preventDefault();
             
-            // Add click event to upcoming movie card
-            movieCard.addEventListener('click', () => showReleaseDate(movie));
+            const movieData = {
+                title: document.getElementById('movieTitle').value,
+                year: document.getElementById('movieYear').value,
+                rating: document.getElementById('movieRating').value,
+                language: document.getElementById('movieLanguage').value,
+                storyline: document.getElementById('movieStoryline').value,
+                poster: document.getElementById('moviePoster').value,
+                movieLink: document.getElementById('movieLink').value,
+                screenshots: [
+                    document.getElementById('screenshot1').value,
+                    document.getElementById('screenshot2').value,
+                    document.getElementById('screenshot3').value
+                ]
+            };
             
-            return movieCard;
-        }
-        
-        // Toggle theme
-        function toggleTheme() {
-            document.body.classList.toggle('dark-mode');
-        }
-        
-        // Show release date for upcoming movies
-        function showReleaseDate(movie) {
-            releaseDate.textContent = movie.releaseDate;
-            releaseNotification.style.display = 'block';
-            
-            // Auto-close after 4 seconds
-            setTimeout(() => {
-                releaseNotification.style.display = 'none';
-            }, 4000);
-        }
-        
-        // Navigate between screenshots in lightbox
-        function navigateScreenshots(direction) {
-            currentScreenshotIndex += direction;
-            
-            // Handle looping
-            if (currentScreenshotIndex < 0) {
-                currentScreenshotIndex = currentScreenshots.length - 1;
-            } else if (currentScreenshotIndex >= currentScreenshots.length) {
-                currentScreenshotIndex = 0;
+            if (isEditing) {
+                // Update existing movie
+                moviesRef.child(currentMovieKey).update(movieData)
+                    .then(() => {
+                        showNotification('Movie updated successfully!', 'success');
+                        resetForm();
+                    })
+                    .catch((error) => {
+                        showNotification('Error updating movie: ' + error.message, 'error');
+                    });
+            } else {
+                // Add new movie
+                moviesRef.push(movieData)
+                    .then(() => {
+                        showNotification('Movie added to Firebase!', 'success');
+                        resetForm();
+                    })
+                    .catch((error) => {
+                        showNotification('Error adding movie: ' + error.message, 'error');
+                    });
             }
+        });
+        
+        // Edit movie
+        function editMovie(key, movie) {
+            isEditing = true;
+            currentMovieKey = key;
             
-            lightboxImg.src = currentScreenshots[currentScreenshotIndex];
+            // Fill form with movie data
+            document.getElementById('movieTitle').value = movie.title;
+            document.getElementById('movieYear').value = movie.year;
+            document.getElementById('movieRating').value = movie.rating;
+            document.getElementById('movieLanguage').value = movie.language;
+            document.getElementById('movieStoryline').value = movie.storyline;
+            document.getElementById('moviePoster').value = movie.poster;
+            document.getElementById('movieLink').value = movie.movieLink;
+            document.getElementById('screenshot1').value = movie.screenshots[0];
+            document.getElementById('screenshot2').value = movie.screenshots[1];
+            document.getElementById('screenshot3').value = movie.screenshots[2];
+            
+            // Update button text
+            uploadBtn.textContent = 'Update Movie';
+            cancelEditBtn.classList.remove('hidden');
+            
+            // Scroll to form
+            movieForm.scrollIntoView({ behavior: 'smooth' });
         }
         
-        // Show movie details
-        function showMovieDetails(movieId) {
-            const movie = movies.find(m => m.id === movieId);
-            if (!movie) return;
+        // Delete movie
+        function deleteMovie(key) {
+            if (confirm('Are you sure you want to delete this movie?')) {
+                moviesRef.child(key).remove()
+                    .then(() => {
+                        showNotification('Movie deleted successfully!', 'success');
+                    })
+                    .catch((error) => {
+                        showNotification('Error deleting movie: ' + error.message, 'error');
+                    });
+            }
+        }
+        
+        // Cancel edit
+        cancelEditBtn.addEventListener('click', () => {
+            resetForm();
+        });
+        
+        // Reset form
+        function resetForm() {
+            movieForm.reset();
+            isEditing = false;
+            currentMovieKey = null;
+            uploadBtn.textContent = 'Upload to Firebase';
+            cancelEditBtn.classList.add('hidden');
+        }
+        
+        // Show notification
+        function showNotification(message, type) {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
             
-            currentMovieId = movieId;
-            currentScreenshots = movie.screenshots;
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Initialize the app
+        window.addEventListener('DOMContentLoaded', () => {
+            // Load movies when page loads
+            loadMovies();
             
-            document.getElementById('detailPoster').src = movie.poster;
-            document.getElementById('detailTitle').textContent = movie.title;
-            document.getElementById('detailRating').textContent = movie.rating;
-            document.getElementById('detailYear').textContent = movie.year;
-            document.getElementById('detailDuration').textContent = movie.duration;
-            document.getElementById('detailLanguage').textContent = movie.language;
-            document.getElementById('detailDescription').textContent = movie.description;
-            
-            // Hide video player initially
-            videoContainer.style.display = 'none';
-            
-            // Update screenshots (only 3)
-            const screenshotsGrid = document.getElementById('screenshotsGrid');
-            screenshotsGrid.innerHTML = '';
-            movie.screenshots.slice(0, 3).forEach((screenshot, index) => {
-                const container = document.createElement('div');
-                container.className = 'screenshot-item';
-                
-                const img = document.createElement('img');
-                img.src = screenshot;
-                img.alt = `${movie.title} screenshot`;
-                img.className = 'screenshot';
-                
-                container.appendChild(img);
-                screenshotsGrid.appendChild(container);
-                
-                // Add click event to open lightbox
-                container.addEventListener('click', () => {
-                    lightboxImg.src = screenshot;
-                    lightbox.style.display = 'flex';
-                    currentScreenshotIndex = index;
+            // Add event listeners for demo buttons (since Firebase config is not set)
+            document.querySelectorAll('.btn-delete').forEach(button => {
+                button.addEventListener('click', () => {
+                    showNotification('Delete functionality requires Firebase configuration', 'warning');
                 });
             });
             
-            homeScreen.style.display = 'none';
-            movieDetailsScreen.style.display = 'block';
-        }
-        
-        // Send data to Telegram
-        function sendToTelegram(movieName, movieYear) {
-            // Telegram bot API endpoint
-            const botToken = '8194173760:AAGLvK4msJcA3-kSHl2udESaEY9ytBIikH8';
-            const chatId = '1011108215';
-            const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            document.querySelectorAll('.btn-edit').forEach(button => {
+                button.addEventListener('click', () => {
+                    showNotification('Edit functionality requires Firebase configuration', 'warning');
+                });
+            });
             
-            // Message format
-            const message = `🎬 New Movie Request:\n\n📽️ Title: ${movieName}\n📅 Year: ${movieYear}`;
-            
-            // Send actual request to Telegram
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: message
-                })
-            })
-            .then(response => response.json())
-            .then(data => console.log('Telegram response:', data))
-            .catch(error => console.error('Error sending to Telegram:', error));
-        }
-        
-        // Create click effect
-        function createClickEffect(x, y) {
-            const effect = document.createElement('div');
-            effect.className = 'click-effect';
-            effect.style.left = `${x - 50}px`;
-            effect.style.top = `${y - 50}px`;
-            document.body.appendChild(effect);
-            
-            // Remove effect after animation completes
-            setTimeout(() => {
-                effect.remove();
-            }, 600);
-        }
-        
-        // Initialize the app when the DOM is loaded
-        document.addEventListener('DOMContentLoaded', initApp);
+            movieForm.addEventListener('submit', (e) => {
+                if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "YOUR_API_KEY") {
+                    e.preventDefault();
+                    showNotification('Please configure Firebase to enable this functionality', 'warning');
+                }
+            });
+        });
     </script>
 </body>
 </html>
